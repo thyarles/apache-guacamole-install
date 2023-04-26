@@ -1,0 +1,50 @@
+services:
+  guacamole:
+    image: guacamole/guacamole:${GM_VERSION}
+    environment:
+      GUACD_HOSTNAME: guacd
+      GUACD_PORT: 4822
+      GUACAMOLE_HOME: /etc/guacamole
+    ports:
+      - "8080:8080"
+    depends_on:
+      deploy:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      guacd:
+        condition: service_started
+    volumes:
+      - ./data/guacamole:/etc/guacamole
+  guacd:
+    image: guacamole/guacd:${GM_VERSION}
+    depends_on:
+      deploy:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+  db:
+    container_name: db
+    image: mysql
+    environment:
+        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        MYSQL_DATABASE: "$GM_DB"
+        MYSQL_USER: "$GM_DB_USER"
+        MYSQL_PASSWORD: "$GM_DB_PASS"
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        interval: 5s
+        timeout: 5s
+        retries: 15
+    depends_on:
+      deploy:
+        condition: service_completed_successfully
+    volumes:
+      - ./data/db:/var/lib/mysql
+      - ./data/download/guacamole-auth-jdbc-1.4.0/mysql/schema:/docker-entrypoint-initdb.d
+  deploy:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
