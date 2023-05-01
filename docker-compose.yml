@@ -1,4 +1,17 @@
 services:
+  haproxy:
+    container_name: haproxy
+    image: haproxytech/haproxy-alpine:2.7
+    ports:
+      - 80:80
+      - 443:443
+      - 8404:8404
+    volumes:
+      - ./data/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./data/ssl:/etc/ssl/guacamole
+    depends_on:
+      guacamole:
+        condition: service_started
   guacamole:
     image: guacamole/guacamole:${GM_VERSION:-1.4.0}
     environment:
@@ -9,13 +22,7 @@ services:
       MYSQL_PASSWORD: ${GM_DB_PASS:-dontDoThisOnProduction}
       MYSQL_USER: ${GM_DB_USER:-guacamole_user}
       MYSQL_AUTO_CREATE_ACCOUNTS: true
-    ports:
-      - "8080:8080"
     depends_on:
-      deploy:
-        condition: service_completed_successfully
-      db:
-        condition: service_healthy
       guacd:
         condition: service_started
     volumes:
