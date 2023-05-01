@@ -32,7 +32,7 @@ o "Copying SQL schema"
 /opt/guacamole/bin/initdb.sh --mysql > "\$SCHEMA"
 # haproxy configuration
 o "Creating SSL certificates"
-openssl req -x509 -nodes -days 365 -subj "/C=BR/ST=DF/O=UnB Inc/CN=unb.br" -newkey rsa:2048 -keyout "\$CERT/server.pem.key" -out "\$CERT/server.pem"
+openssl req -x509 -nodes -days 365 -subj "/C=BR/ST=DF/O=UNB/CN=unb.br" -newkey rsa:2048 -keyout "\$CERT/server.pem.key" -out "\$CERT/server.pem"
 o "Creating haproxy configuration"
 cat > "$\BASE/haproxy.cfg" << EOF
     global
@@ -59,6 +59,8 @@ cat > "$\BASE/haproxy.cfg" << EOF
         bind *:443 ssl crt /etc/ssl/guacamole/server.pem 
         redirect scheme https if !{ ssl_fc }
         mode http
+	acl is_root path -i /
+	http-request set-path /guacamole if is_root
         default_backend guacamole
     backend guacamole
         server guacamole guacamole:8080 check inter 10s resolvers docker_resolver

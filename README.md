@@ -24,4 +24,4 @@ What you going to get:
     docker-compose up
     ```
  
-3. Access it: https://localhost/guacamole    
+3. Access it: http://localhost or https://localhost or https://localhost/guacamole 
