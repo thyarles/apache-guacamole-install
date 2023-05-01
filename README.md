@@ -24,9 +24,4 @@ What you going to get:
     docker-compose up
     ```
  
-3. If everything goes well, stop it (`control + c`) and start again in background
-    ```bash
-    docker-compose up -d
-    ``` 
-4. Access it from you localhost: https://localhost/guacamole
-    
+3. Access it: https://localhost/guacamole    
