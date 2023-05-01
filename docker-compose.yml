@@ -1,10 +1,14 @@
 services:
   guacamole:
-    image: guacamole/guacamole:${GM_VERSION}
+    image: guacamole/guacamole:${GM_VERSION:-1.4.0}
     environment:
+      GUACAMOLE_HOME: /opt/guacamole
       GUACD_HOSTNAME: guacd
-      GUACD_PORT: 4822
-      GUACAMOLE_HOME: /etc/guacamole
+      MYSQL_DATABASE: ${GM_DB:-guacamole_db}
+      MYSQL_HOSTNAME: db
+      MYSQL_PASSWORD: ${GM_DB_PASS:-dontDoThisOnProduction}
+      MYSQL_USER: ${GM_DB_USER:-guacamole_user}
+      MYSQL_AUTO_CREATE_ACCOUNTS: true
     ports:
       - "8080:8080"
     depends_on:
@@ -15,9 +19,9 @@ services:
       guacd:
         condition: service_started
     volumes:
-      - ./data/guacamole:/etc/guacamole
+      - ./data/extensions:/opt/guacamole/extensions
   guacd:
-    image: guacamole/guacd:${GM_VERSION}
+    image: guacamole/guacd:${GM_VERSION:-1.4.0}
     depends_on:
       deploy:
         condition: service_completed_successfully
@@ -27,24 +31,24 @@ services:
     container_name: db
     image: mysql
     environment:
-        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-        MYSQL_DATABASE: "$GM_DB"
-        MYSQL_USER: "$GM_DB_USER"
-        MYSQL_PASSWORD: "$GM_DB_PASS"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: ${GM_DB:-guacamole_db}
+      MYSQL_USER: ${GM_DB_USER:-guacamole_user}
+      MYSQL_PASSWORD: ${GM_DB_PASS:-dontDoThisOnProduction}
     healthcheck:
-        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-        interval: 5s
-        timeout: 5s
-        retries: 15
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
     depends_on:
       deploy:
         condition: service_completed_successfully
     volumes:
       - ./data/db:/var/lib/mysql
-      - ./data/download/guacamole-auth-jdbc-1.4.0/mysql/schema:/docker-entrypoint-initdb.d
+      - ./data/schema.sql:/docker-entrypoint-initdb.d/schema.sql
   deploy:
     build: .
     env_file:
       - .env
     volumes:
-      - ./data:/app/data
+      - ./data:/data
