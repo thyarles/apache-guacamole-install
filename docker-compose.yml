@@ -1,6 +1,6 @@
 services:
   haproxy:
-    container_name: haproxy
+    container_name: gioc-haproxy
     image: haproxytech/haproxy-alpine:2.7
     ports:
       - 80:80
@@ -13,6 +13,7 @@ services:
       guacamole:
         condition: service_started
   guacamole:
+    container_name: gioc-guacamole
     image: guacamole/guacamole:${GM_VERSION:-1.4.0}
     environment:
       GUACAMOLE_HOME: /opt/guacamole
@@ -28,6 +29,7 @@ services:
     volumes:
       - ./data/extensions:/opt/guacamole/extensions
   guacd:
+    container_name: gioc-guacd
     image: guacamole/guacd:${GM_VERSION:-1.4.0}
     depends_on:
       deploy:
@@ -35,7 +37,7 @@ services:
       db:
         condition: service_healthy
   db:
-    container_name: db
+    container_name: gioc-db
     image: mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -54,6 +56,7 @@ services:
       - ./data/db:/var/lib/mysql
       - ./data/schema.sql:/docker-entrypoint-initdb.d/schema.sql
   deploy:
+    container_name: gioc-deploy
     build: .
     env_file:
       - .env
