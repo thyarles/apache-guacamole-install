@@ -19,7 +19,7 @@ What you going to get:
     cp .env-example .env
     ```
  
-2. Start the docker stack in front end at the first time (to easily see the deployment)
+2. Start the docker compose
     ```bash
     docker-compose up
     ```
