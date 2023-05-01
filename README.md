@@ -1,4 +1,4 @@
-# Run Guacamole In One Command
+# GIOC - Guacamole In One Command
 
 An easy way to deploy *Guacamole* on your machine --- just for fun.
 
