@@ -59,8 +59,6 @@ cat > "$\BASE/haproxy.cfg" << EOF
         bind *:443 ssl crt /etc/ssl/guacamole/server.pem 
         redirect scheme https if !{ ssl_fc }
         mode http
-	acl is_root path -i /
-	http-request set-path /guacamole if is_root
         default_backend guacamole
     backend guacamole
         server guacamole guacamole:8080 check inter 10s resolvers docker_resolver

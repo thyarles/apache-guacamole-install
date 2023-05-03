@@ -17,6 +17,7 @@ services:
     image: guacamole/guacamole:${GM_VERSION:-1.4.0}
     environment:
       GUACAMOLE_HOME: /opt/guacamole
+      WEBAPP_CONTEXT: ROOT
       GUACD_HOSTNAME: guacd
       MYSQL_DATABASE: ${GM_DB:-guacamole_db}
       MYSQL_HOSTNAME: db
