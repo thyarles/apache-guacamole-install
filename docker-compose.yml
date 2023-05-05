@@ -2,13 +2,30 @@ services:
   haproxy:
     container_name: gioc-haproxy
     image: haproxytech/haproxy-alpine:2.7
+    profiles:
+      - haproxy
     ports:
-      - 80:80
-      - 443:443
-      - 8404:8404
+     - 8443:443
+     - 8404:8404
     volumes:
-      - ./data/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-      - ./data/ssl:/etc/ssl/guacamole
+     - ./data/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+     - ./data/ssl:/etc/ssl/guacamole
+    depends_on:
+     guacamole:
+       condition: service_started
+  web:
+    container_name: gioc-nginx
+    image: nginx
+    profiles:
+      - nginx
+    volumes:
+     - ./data/nginx.conf:/etc/nginx/conf.d/default.conf
+     - ./data/.htpasswd:/etc/nginx/.htpasswd
+    ports:
+     - 8080:80
+    environment:
+     - NGINX_HOST=api.provadigital.com.br
+     - NGINX_PORT=80
     depends_on:
       guacamole:
         condition: service_started
@@ -29,6 +46,8 @@ services:
         condition: service_started
     volumes:
       - ./data/extensions:/opt/guacamole/extensions
+    extra_hosts:
+      - "guacd:host-gateway"
   guacd:
     container_name: gioc-guacd
     image: guacamole/guacd:${GM_VERSION:-1.4.0}
@@ -37,6 +56,7 @@ services:
         condition: service_completed_successfully
       db:
         condition: service_healthy
+    network_mode: host
   db:
     container_name: gioc-db
     image: mysql

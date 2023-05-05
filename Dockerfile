@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM guacamole/guacamole:${GM_VERSION:-1.5.1}
 
+RUN apt-get update && apt-get -y install apache2-utils
+
 # SCRIPT
 COPY <<-SCRIPT start.sh
 # Variables
@@ -9,11 +11,12 @@ SCHEMA="\$BASE/schema.sql"
 EXTENSIONS="\$BASE/extensions"
 CERT="\$BASE/ssl"
 CHECK="\$BASE/.deployed"
+HTPASS="\$BASE/.htpasswd"
 # Functions
 o() { echo "==> \$1"; }
 e() { echo "==> ERR: \$1!"; exit \$2; }
 # Check environment
-for i in VERSION DB DB_NAME DB_USER DB_PASS MFA; do
+for i in VERSION DB DB_NAME DB_USER DB_PASS MFA NG_USER NG_PASS; do
     [ "\$(printenv GM_\$i)x" == "x" ] && e "\GM_\$i not found. You should have a .env (copy from .env-example)" 1
 done
 # Check if it was installed before
@@ -63,8 +66,28 @@ cat > "$\BASE/haproxy.cfg" << EOF
     backend guacamole
         server guacamole guacamole:8080 check inter 10s resolvers docker_resolver
 EOF
+o "Creating nginx configuration"
+cat > "\$BASE/haproxy.cfg" << EOF
+    server {
+        location / {
+            auth_basic "Restricted Access";
+            auth_basic_user_file /etc/nginx/.htpasswd;
+            proxy_pass http://guacamole:8080;
+            proxy_buffering off;
+            proxy_http_version 1.1;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $http_connection;
+            client_max_body_size 1g;
+            access_log off;
+        }
+    }
+EOF
+o "Creating .htpasswd file for the user \$NG_USER"
+htpasswd -bc "\$HTPASS" "\$NG_USER" "\$NG_PASS"
 o "Creating file \$CHECK to lock the setup next time"
 touch "\$CHECK"
+o "You should create a passwd file if using "
 SCRIPT
 
 USER root

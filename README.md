@@ -19,9 +19,14 @@ What you going to get:
     cp .env-example .env
     ```
  
-2. Start the docker compose
+2. Start the docker compose with NGINX on port 80
     ```bash
-    docker-compose up
+    docker-compose --profile nginx up
     ```
- 
-3. Access it: http://localhost or https://localhost 
+
+2. Start the docker compose with HAPROXY on port 443
+    ```bash
+    docker-compose --profile haproxy up
+    ```
+
+3. Access it: http://localhost:8080 (nginx) or https://localhost:8443 (haproxy)
