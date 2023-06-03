@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM guacamole/guacamole:${GM_VERSION:-1.5.1}
 
+USER root
+
 RUN apt-get update && apt-get -y install apache2-utils
 
 # SCRIPT
@@ -67,7 +69,7 @@ cat > "$\BASE/haproxy.cfg" << EOF
         server guacamole guacamole:8080 check inter 10s resolvers docker_resolver
 EOF
 o "Creating nginx configuration"
-cat > "\$BASE/haproxy.cfg" << EOF
+cat > "\$BASE/nginx.cfg" << EOF
     server {
         location / {
             auth_basic "Restricted Access";
@@ -89,7 +91,5 @@ o "Creating file \$CHECK to lock the setup next time"
 touch "\$CHECK"
 o "You should create a passwd file if using "
 SCRIPT
-
-USER root
 
 CMD [ "bash", "start.sh" ]
