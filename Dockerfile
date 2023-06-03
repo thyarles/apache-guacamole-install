@@ -85,8 +85,8 @@ cat > "\$BASE/nginx.conf" << 'EOF'
         }
     }
 EOF
-o "Creating .htpasswd file for the user \$NG_USER"
-htpasswd -bc "\$HTPASS" "\$NG_USER" "\$NG_PASS"
+o "Creating .htpasswd file for the user \$GM_NG_USER"
+htpasswd -bc "\$HTPASS" "\$GM_NG_USER" "\$GM_NG_PASS"
 o "Creating file \$CHECK to lock the setup next time"
 touch "\$CHECK"
 o "You should create a passwd file if using "
