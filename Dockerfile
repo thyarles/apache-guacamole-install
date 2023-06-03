@@ -69,7 +69,7 @@ cat > "$\BASE/haproxy.cfg" << EOF
         server guacamole guacamole:8080 check inter 10s resolvers docker_resolver
 EOF
 o "Creating nginx configuration"
-cat > "\$BASE/nginx.cfg" << EOF
+cat > "\$BASE/nginx.conf" << EOF
     server {
         location / {
             auth_basic "Restricted Access";
