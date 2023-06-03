@@ -74,7 +74,7 @@ services:
       deploy:
         condition: service_completed_successfully
     volumes:
-      - ./data/db:/var/lib/mysql
+      - db:/var/lib/mysql
       - ./data/schema.sql:/docker-entrypoint-initdb.d/schema.sql
   deploy:
     container_name: gioc-deploy
@@ -83,3 +83,6 @@ services:
       - .env
     volumes:
       - ./data:/data
+
+volumes:
+ db:

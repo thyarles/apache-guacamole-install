@@ -4,9 +4,14 @@ An easy way to deploy *Guacamole* on your machine --- just for fun.
 
 What you going to get:
 
-* HAProxy 2.7 (with SSL configured automatically)
+* OR HAProxy (with SSL configured automatically)
+* OR Nginx (with httppass configured automatically)
 * Guacamole version 1.5.1 (database and first user configured automatically)
+* GuaCD connecting on your host
 * MySQL (latest stable version)
+
+## Know issues
+If you are using MacOS with Rancher Desktop, you need to run the `docker-compose up -d` command twice (some bug)
 
 ## Requirements
 
