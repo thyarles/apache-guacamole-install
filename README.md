@@ -1,4 +1,4 @@
-# Guacamole For All
+# Apache Guacamole - Full Stack in one command
 
 An easy way to deploy *Guacamole* on your machine --- just for fun.
 
